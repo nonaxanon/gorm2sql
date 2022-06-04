@@ -7,7 +7,7 @@ A Swiss Army Knife helps you generate sql from [gorm](https://github.com/jinzhu/
 ## Installation
 
 ```
-go get github.com/liudanking/gorm2sql
+go get github.com/nonaxanon/gorm2sql
 ```
 
 ## Usage

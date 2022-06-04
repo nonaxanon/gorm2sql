@@ -7,7 +7,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/liudanking/gorm2sql/util"
+	"github.com/nonaxanon/gorm2sql/util"
 
 	"github.com/pinzolo/casee"
 
@@ -100,7 +100,7 @@ func (ms *SqlGenerator) GetCreateTableSql() (string, error) {
   %v,
   %v
 ) %v;`,
-		"`"+ms.tableName()+"`",
+		ms.tableName(),
 		strings.Join(append(tags, append(indicesStrs, uniqIndicesStrs...)...), ",\n  "),
 		primaryKeyStr,
 		strings.Join(options, " ")), nil
@@ -195,7 +195,7 @@ func getColumnName(field *ast.Field) string {
 	}
 
 	if len(field.Names) > 0 {
-		return fmt.Sprintf("`%s`", casee.ToSnakeCase(field.Names[0].Name))
+		return fmt.Sprintf("%s", casee.ToSnakeCase(field.Names[0].Name))
 	}
 
 	return ""

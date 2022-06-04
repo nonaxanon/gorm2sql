@@ -11,8 +11,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/liudanking/gorm2sql/gencode"
-	"github.com/liudanking/gorm2sql/program"
+	"github.com/nonaxanon/gorm2sql/gencode"
+	"github.com/nonaxanon/gorm2sql/program"
 
 	log "github.com/liudanking/goutil/logutil"
 	"github.com/urfave/cli"

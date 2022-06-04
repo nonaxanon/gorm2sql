@@ -3,7 +3,7 @@ package main
 import (
 	"os"
 
-	"github.com/liudanking/gorm2sql/sqlorm"
+	"github.com/nonaxanon/gorm2sql/sqlorm"
 
 	log "github.com/liudanking/goutil/logutil"
 
