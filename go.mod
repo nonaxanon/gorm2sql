@@ -1,4 +1,4 @@
-module gorm2sql
+module github.com/nonaxanon/gorm2sql
 
 go 1.18
 
