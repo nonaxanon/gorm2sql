@@ -72,7 +72,6 @@ func (ms *SqlGenerator) GetCreateTableSql() (string, error) {
 			keys = append(keys, columnName)
 			uniqIndces[idxName] = keys
 		}
-
 	}
 
 	var primaryKeyStr string
@@ -90,10 +89,10 @@ func (ms *SqlGenerator) GetCreateTableSql() (string, error) {
 		uniqIndicesStrs = append(uniqIndicesStrs, fmt.Sprintf("UNIQUE INDEX %s (%s)", idxName, strings.Join(keys, ", ")))
 	}
 
-	options := []string{
-		"engine=innodb",
-		"DEFAULT charset=utf8mb4",
-	}
+	//options := []string{
+	//	"engine=innodb",
+	//	"DEFAULT charset=utf8mb4",
+	//}
 
 	return fmt.Sprintf(`CREATE TABLE %v 
 (
@@ -103,7 +102,8 @@ func (ms *SqlGenerator) GetCreateTableSql() (string, error) {
 		ms.tableName(),
 		strings.Join(append(tags, append(indicesStrs, uniqIndicesStrs...)...), ",\n  "),
 		primaryKeyStr,
-		strings.Join(options, " ")), nil
+		//strings.Join(options, " ")), nil
+	), nil
 }
 
 func (ms *SqlGenerator) getStructFieds(node ast.Node) []*ast.Field {
@@ -243,7 +243,7 @@ func mysqlTag(field *ast.Field, size int, autoIncrease bool) (string, error) {
 		return "double", nil
 	case "string", "NullString":
 		if size > 0 && size < 65532 {
-			return fmt.Sprintf("varchar(%d)", size), nil
+			return fmt.Sprintf("text"), nil
 		}
 		return "longtext", nil
 	case "Time":
