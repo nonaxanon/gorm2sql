@@ -24,7 +24,6 @@ func GetFieldTag(field *ast.Field, key string) *structtag.Tag {
 	if err != nil {
 		return &structtag.Tag{}
 	}
-
 	return tag
 }
 

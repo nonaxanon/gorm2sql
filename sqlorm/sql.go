@@ -39,6 +39,7 @@ func (ms *SqlGenerator) GetCreateTableSql() (string, error) {
 	for _, field := range ms.getStructFieds(ms.modelType) {
 		switch t := field.Type.(type) {
 		case *ast.Ident:
+			log.Info(t.Name)
 			tag, err := generateSqlTag(field)
 			if err != nil {
 				log.Warning("generateSqlTag [%s] failed:%v", t.Name, err)
@@ -72,6 +73,7 @@ func (ms *SqlGenerator) GetCreateTableSql() (string, error) {
 			keys = append(keys, columnName)
 			uniqIndces[idxName] = keys
 		}
+
 	}
 
 	var primaryKeyStr string
@@ -89,10 +91,10 @@ func (ms *SqlGenerator) GetCreateTableSql() (string, error) {
 		uniqIndicesStrs = append(uniqIndicesStrs, fmt.Sprintf("UNIQUE INDEX %s (%s)", idxName, strings.Join(keys, ", ")))
 	}
 
-	//options := []string{
-	//	"engine=innodb",
-	//	"DEFAULT charset=utf8mb4",
-	//}
+	options := []string{
+		"engine=innodb",
+		"DEFAULT charset=utf8mb4",
+	}
 
 	return fmt.Sprintf(`CREATE TABLE %v 
 (
@@ -103,7 +105,7 @@ func (ms *SqlGenerator) GetCreateTableSql() (string, error) {
 		strings.Join(append(tags, append(indicesStrs, uniqIndicesStrs...)...), ",\n  "),
 		primaryKeyStr,
 		//strings.Join(options, " ")), nil
-	), nil
+		strings.Join(options, " ")), nil
 }
 
 func (ms *SqlGenerator) getStructFieds(node ast.Node) []*ast.Field {
@@ -145,14 +147,16 @@ func generateSqlTag(field *ast.Field) (string, error) {
 	var err error
 
 	tagStr := util.GetFieldTag(field, "sql").Name
+	log.Info(tagStr)
 	sqlSettings := ParseTagSetting(tagStr)
+	fmt.Println("dddddddddd ", sqlSettings)
 
-	if value, ok := sqlSettings["TYPE"]; ok {
+	if value, ok := sqlSettings["type:uuid"]; ok {
+		log.Info("eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee")
 		sqlType = value
 	}
-
-	if _, found := sqlSettings["NOT NULL"]; !found { // default: not null
-		sqlSettings["NOT NULL"] = "NOT NULL"
+	if _, found := sqlSettings["not null"]; !found { // default: not null
+		sqlSettings["not null"] = "NOT NULL"
 	}
 
 	additionalType := sqlSettings["NOT NULL"] + " " + sqlSettings["UNIQUE"]
@@ -189,7 +193,9 @@ func generateSqlTag(field *ast.Field) (string, error) {
 
 func getColumnName(field *ast.Field) string {
 	tagStr := util.GetFieldTag(field, "gorm").Name
+	//log.Info(tagStr)
 	gormSettings := ParseTagSetting(tagStr)
+	//fmt.Println(gormSettings)
 	if columnName, ok := gormSettings["COLUMN"]; ok {
 		return columnName
 	}
@@ -217,6 +223,8 @@ func isPrimaryKey(field *ast.Field) bool {
 
 func mysqlTag(field *ast.Field, size int, autoIncrease bool) (string, error) {
 	typeName := ""
+	fmt.Println("tag ", field.Tag)
+
 	switch t := field.Type.(type) {
 	case *ast.Ident:
 		typeName = t.Name
@@ -226,6 +234,7 @@ func mysqlTag(field *ast.Field, size int, autoIncrease bool) (string, error) {
 		return "", errors.New(fmt.Sprintf("field %s not supported", util.GetFieldName(field)))
 	}
 
+	//log.Info(typeName)
 	switch typeName {
 	case "bool":
 		return "boolean", nil
@@ -248,6 +257,8 @@ func mysqlTag(field *ast.Field, size int, autoIncrease bool) (string, error) {
 		return "longtext", nil
 	case "Time":
 		return "datetime", nil
+	case "type uuid":
+		return "", errors.New(fmt.Sprintf("type %s not supported", typeName))
 	default:
 		return "", errors.New(fmt.Sprintf("type %s not supported", typeName))
 
@@ -261,10 +272,11 @@ func ParseTagSetting(str string) map[string]string {
 		v := strings.Split(value, ":")
 		k := strings.TrimSpace(strings.ToUpper(v[0]))
 		if len(v) == 2 {
-			setting[k] = v[1]
+			setting[k] = v[0]
 		} else {
 			setting[k] = k
 		}
 	}
+	fmt.Println(" the fucking setting is ", setting)
 	return setting
 }
